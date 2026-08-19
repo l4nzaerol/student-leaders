@@ -17,6 +17,8 @@
  */
 
 const CONFIG = {
+  /** Spreadsheet ID from the URL: https://docs.google.com/spreadsheets/d/<ID>/edit */
+  spreadsheetId: "13JGVE0MidL2C8dFwsM8MY0wyBbxwE-NclHO8JIQgNKU",
   /** Matches the Form question "Full Name:" (colon optional in the sheet header) */
   nameHeader: "Full Name:",
   /** Matches the Form question "Email Address" */
@@ -37,7 +39,7 @@ function doGet(e) {
     .toLowerCase();
 
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheets()[0];
     const data = sheet.getDataRange().getValues();
     if (data.length < 2) {
       return json_({ ok: false, error: "No feedback responses yet." }, callback);

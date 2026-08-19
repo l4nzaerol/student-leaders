@@ -5,13 +5,6 @@ export type Recipient = {
   email?: string;
 };
 
-type LookupResponse = {
-  ok: boolean;
-  name?: string;
-  email?: string;
-  error?: string;
-};
-
 export class LookupError extends Error {
   constructor(message: string) {
     super(message);
@@ -27,63 +20,132 @@ export function parseCertificateParams(search = window.location.search) {
   };
 }
 
-function jsonpLookup(url: string): Promise<LookupResponse> {
-  return new Promise((resolve, reject) => {
-    const callbackName = `__certCb${Date.now()}${Math.floor(Math.random() * 1e6)}`;
-    const script = document.createElement("script");
+/**
+ * Proper CSV parser that handles:
+ * - Quoted fields containing commas
+ * - Quoted fields containing newlines
+ * - Escaped quotes ("" inside quoted fields)
+ */
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let current = "";
+  let inQuotes = false;
 
-    const timer = window.setTimeout(() => {
-      cleanup();
-      reject(new LookupError("Lookup timed out. Check that the Apps Script web app is deployed."));
-    }, 15000);
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
 
-    const cleanup = () => {
-      window.clearTimeout(timer);
-      script.remove();
-      delete (window as unknown as Record<string, unknown>)[callbackName];
-    };
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += ch;
+      }
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === ",") {
+      row.push(current);
+      current = "";
+    } else if (ch === "\n") {
+      row.push(current);
+      current = "";
+      // Skip \r if present (Windows line endings)
+      if (row.length > 1 || row[0].trim() !== "") {
+        rows.push(row);
+      }
+      row = [];
+    } else if (ch === "\r") {
+      // Ignore carriage return (handled by \n)
+    } else {
+      current += ch;
+    }
+  }
 
-    (window as unknown as Record<string, unknown>)[callbackName] = (data: LookupResponse) => {
-      cleanup();
-      resolve(data);
-    };
+  // Push the last row if there's content
+  row.push(current);
+  if (row.length > 1 || row[0].trim() !== "") {
+    rows.push(row);
+  }
 
-    script.onerror = () => {
-      cleanup();
-      reject(new LookupError("Could not reach the certificate service. Try again in a moment."));
-    };
+  return rows.filter((r) => r.some((cell) => cell.trim() !== ""));
+}
 
-    const request = new URL(url);
-    request.searchParams.set("callback", callbackName);
-    script.src = request.toString();
-    document.body.appendChild(script);
-  });
+/** Fetch the spreadsheet as CSV directly from Google Sheets — no Apps Script needed. */
+async function fetchSpreadsheetCsv(): Promise<string[][]> {
+  const url = `https://docs.google.com/spreadsheets/d/${lookup.spreadsheetId}/export?format=csv&gid=${lookup.sheetGid}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) {
+    throw new LookupError("Could not reach the participant database. Try again in a moment.");
+  }
+  const text = await res.text();
+  return parseCsv(text);
+}
+
+function normalizeHeader(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/:+$/, "")
+    .replace(/\s+/g, " ");
+}
+
+function findHeader(headers: string[], wanted: string): number {
+  const needle = normalizeHeader(wanted);
+  return headers.findIndex((h) => normalizeHeader(h) === needle);
+}
+
+/** Look up a recipient directly from the Google Sheet. */
+async function lookupFromSheet(query: { token?: string; email?: string }): Promise<Recipient> {
+  const rows = await fetchSpreadsheetCsv();
+  if (rows.length < 2) {
+    throw new LookupError("No feedback responses yet.");
+  }
+
+  const headers = rows[0];
+  const nameCol = findHeader(headers, "Full Name:");
+  const emailCol = findHeader(headers, "Email Address");
+  const tokenCol = findHeader(headers, "Certificate Token");
+
+  if (nameCol < 0 || emailCol < 0) {
+    throw new LookupError(
+      "Name or Email column was not found in the spreadsheet. Check the sheet headers.",
+    );
+  }
+
+  const token = query.token?.trim();
+  const email = query.email?.trim().toLowerCase();
+
+  for (let r = rows.length - 1; r >= 1; r--) {
+    const row = rows[r];
+    const rowEmail = (row[emailCol] || "").trim().toLowerCase();
+    const rowToken = tokenCol >= 0 ? (row[tokenCol] || "").trim() : "";
+    const rowName = (row[nameCol] || "").trim();
+
+    const match = token ? rowToken && rowToken === token : email && rowEmail === email;
+    if (match && rowName) {
+      return { name: rowName, email: rowEmail };
+    }
+  }
+
+  throw new LookupError(
+    token
+      ? "This certificate link is invalid or has expired."
+      : "No feedback submission was found for that email.",
+  );
 }
 
 export async function fetchRecipient(query: {
   token?: string;
   email?: string;
 }): Promise<Recipient> {
-  if (!lookup.appsScriptUrl) {
-    throw new LookupError(
-      "The certificate lookup service is not configured yet. Add VITE_APPS_SCRIPT_URL after deploying Apps Script.",
-    );
-  }
-
-  const url = new URL(lookup.appsScriptUrl);
-  if (query.token) url.searchParams.set("token", query.token);
-  else if (query.email) url.searchParams.set("email", query.email);
-  else {
+  if (!query.token && !query.email) {
     throw new LookupError("Enter the email you used on the feedback form.");
   }
 
-  const data = await jsonpLookup(url.toString());
-  if (!data.ok || !data.name) {
-    throw new LookupError(
-      data.error ||
-        "We could not find a feedback submission for that email. Use the same email you entered on the form.",
-    );
-  }
-
-  return { name: data.name.trim(), email: data.email };
+  return lookupFromSheet(query);
 }

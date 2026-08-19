@@ -11,14 +11,16 @@ export const seminar = {
   organization: "CYSDO",
 };
 
-const DEFAULT_APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzZlAtTRwBK6ogHj2GFM60hssOE22O2KJ1FanVd69kCZbOJ38Opqek8GJ5GbSiuUPxT/exec";
-
 const DEFAULT_FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/1MqY0zLilkT2CUckM-az3lXPfdCxHl8YANEIJPaH5_dE/viewform";
 
+/** Spreadsheet ID and sheet GID from the responses spreadsheet URL */
+const SPREADSHEET_ID = "13JGVE0MidL2C8dFwsM8MY0wyBbxwE-NclHO8JIQgNKU";
+const SHEET_GID = "1335361964";
+
 export const lookup = {
-  appsScriptUrl: (import.meta.env.VITE_APPS_SCRIPT_URL || DEFAULT_APPS_SCRIPT_URL).trim(),
+  spreadsheetId: (import.meta.env.VITE_SPREADSHEET_ID || SPREADSHEET_ID).trim(),
+  sheetGid: (import.meta.env.VITE_SHEET_GID || SHEET_GID).trim(),
   feedbackFormUrl: (import.meta.env.VITE_FEEDBACK_FORM_URL || DEFAULT_FEEDBACK_FORM_URL).trim(),
 };
 
