@@ -31,6 +31,119 @@
   color: #4d5870;
 }
 
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #8a7340;
+  letter-spacing: 0.04em;
+}
+
+.hero-meta {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.chip {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #e3e8f0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4d5870;
+  box-shadow: 0 4px 14px rgba(26, 39, 68, 0.05);
+}
+
+.steps {
+  margin-bottom: 24px;
+}
+
+.steps h2 {
+  margin: 0 0 16px;
+  text-align: center;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.step {
+  background: #fff;
+  border: 1px solid #e3e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(26, 39, 68, 0.06);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1a2744;
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.step h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.step p {
+  margin: 0;
+  font-size: 14px;
+  color: #4d5870;
+}
+
+.result-note {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: #5c6578;
+}
+
+.footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid #dde3ec;
+  text-align: center;
+}
+
+.footer-main {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4d5870;
+}
+
+.footer-sub {
+  margin: 0;
+  font-size: 13px;
+  color: #7a8499;
+}
+
+@media (max-width: 720px) {
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .card {
   background: #fff;
   border: 1px solid #e3e8f0;
@@ -71,6 +184,47 @@ button {
   padding: 12px 18px;
   font-weight: 600;
   cursor: pointer;
+}
+
+button .spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  vertical-align: -2px;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  font-size: 14px;
+  color: #4d5870;
+}
+
+.loading-status span[aria-hidden="true"] {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 button:disabled {

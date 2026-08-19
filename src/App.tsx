@@ -52,11 +52,38 @@ export default function App() {
       <header className="hero">
         <p className="eyebrow">{seminar.organization}</p>
         <h1>{seminar.title}</h1>
+        <p className="subtitle">{seminar.subtitle}</p>
         <p className="lede">
           After you submit the feedback form, use this page to generate your e-certificate.
           The name printed is taken exactly from the <strong>Full Name</strong> you entered on the form.
         </p>
+        <div className="hero-meta">
+          <span className="chip">{seminar.dateLabel}</span>
+          <span className="chip">E-Certificate</span>
+          <span className="chip">PNG Download</span>
+        </div>
       </header>
+
+      <section className="steps">
+        <h2>How it works</h2>
+        <div className="steps-grid">
+          <div className="step">
+            <span className="step-num">1</span>
+            <h3>Submit feedback</h3>
+            <p>Fill out the feedback form with your full name and the email you use below.</p>
+          </div>
+          <div className="step">
+            <span className="step-num">2</span>
+            <h3>Enter your email</h3>
+            <p>Use the exact same email address you submitted on the feedback form.</p>
+          </div>
+          <div className="step">
+            <span className="step-num">3</span>
+            <h3>Download your certificate</h3>
+            <p>Generate your e-certificate and save it as a PNG image to share or print.</p>
+          </div>
+        </div>
+      </section>
 
       {status !== "ready" && (
         <form className="card" onSubmit={onSubmit}>
@@ -72,9 +99,21 @@ export default function App() {
               onChange={(e) => setEmail(e.target.value)}
             />
             <button type="submit" disabled={status === "loading"}>
-              {status === "loading" ? "Looking up…" : "Generate certificate"}
+              {status === "loading" ? (
+                <>
+                  <span className="spinner" aria-hidden="true" />
+                  Looking up…
+                </>
+              ) : (
+                "Generate certificate"
+              )}
             </button>
           </div>
+          {status === "loading" && (
+            <p className="loading-status" role="status">
+              <span aria-hidden="true">⏳</span> Checking the participant database…
+            </p>
+          )}
           {lookup.feedbackFormUrl && (
             <p className="hint">
               Have not submitted feedback?{" "}
@@ -112,8 +151,21 @@ export default function App() {
           <div className="canvas-wrap">
             <canvas ref={canvasRef} />
           </div>
+          <p className="result-note">
+            Tip: the certificate is generated at a high resolution — download the PNG and check your
+            downloads folder to view or print it at full quality.
+          </p>
         </section>
       )}
+
+      <footer className="footer">
+        <p className="footer-main">
+          {seminar.organization} · {seminar.title} · {seminar.dateLabel}
+        </p>
+        <p className="footer-sub">
+          For questions about your certificate, please contact the organizing committee.
+        </p>
+      </footer>
     </div>
   );
 }
