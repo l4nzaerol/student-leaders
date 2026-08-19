@@ -15,8 +15,8 @@ const DEFAULT_FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/1MqY0zLilkT2CUckM-az3lXPfdCxHl8YANEIJPaH5_dE/viewform";
 
 /** Spreadsheet ID and sheet GID from the responses spreadsheet URL */
-const SPREADSHEET_ID = "13JGVE0MidL2C8dFwsM8MY0wyBbxwE-NclHO8JIQgNKU";
-const SHEET_GID = "1335361964";
+const SPREADSHEET_ID = "1_G75nQ0Z_pbCfmitZMCBfs_E2zcvTYYw0E3PgU9NsQE";
+const SHEET_GID = "0";
 
 export const lookup = {
   spreadsheetId: (import.meta.env.VITE_SPREADSHEET_ID || SPREADSHEET_ID).trim(),

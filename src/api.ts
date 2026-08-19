@@ -77,7 +77,9 @@ function parseCsv(text: string): string[][] {
 
 /** Fetch the spreadsheet as CSV directly from Google Sheets — no Apps Script needed. */
 async function fetchSpreadsheetCsv(): Promise<string[][]> {
-  const url = `https://docs.google.com/spreadsheets/d/${lookup.spreadsheetId}/export?format=csv&gid=${lookup.sheetGid}`;
+  // Only include gid if it's explicitly set (not "0"), otherwise use the default sheet
+  const gidParam = lookup.sheetGid && lookup.sheetGid !== "0" ? `&gid=${encodeURIComponent(lookup.sheetGid)}` : "";
+  const url = `https://docs.google.com/spreadsheets/d/${lookup.spreadsheetId}/export?format=csv${gidParam}`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
     throw new LookupError("Could not reach the participant database. Try again in a moment.");
