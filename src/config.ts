@@ -11,11 +11,15 @@ export const seminar = {
   organization: "CYSDO",
 };
 
+const DEFAULT_APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzZlAtTRwBK6ogHj2GFM60hssOE22O2KJ1FanVd69kCZbOJ38Opqek8GJ5GbSiuUPxT/exec";
+
+const DEFAULT_FEEDBACK_FORM_URL =
+  "https://docs.google.com/forms/d/1MqY0zLilkT2CUckM-az3lXPfdCxHl8YANEIJPaH5_dE/viewform";
+
 export const lookup = {
-  /** Deployed Apps Script web app URL ending in /exec */
-  appsScriptUrl: import.meta.env.VITE_APPS_SCRIPT_URL ?? "",
-  /** Public Google Form respondents already submitted */
-  feedbackFormUrl: import.meta.env.VITE_FEEDBACK_FORM_URL ?? "",
+  appsScriptUrl: (import.meta.env.VITE_APPS_SCRIPT_URL || DEFAULT_APPS_SCRIPT_URL).trim(),
+  feedbackFormUrl: (import.meta.env.VITE_FEEDBACK_FORM_URL || DEFAULT_FEEDBACK_FORM_URL).trim(),
 };
 
 export const certificateLayout = {

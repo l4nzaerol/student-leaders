@@ -71,16 +71,10 @@ export default function App() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <button type="submit" disabled={status === "loading" || !lookup.appsScriptUrl}>
+            <button type="submit" disabled={status === "loading"}>
               {status === "loading" ? "Looking up…" : "Generate certificate"}
             </button>
           </div>
-          {!lookup.appsScriptUrl && (
-            <p className="hint">
-              Lookup is not connected yet. Deploy the Apps Script web app, then set{" "}
-              <code>VITE_APPS_SCRIPT_URL</code>.
-            </p>
-          )}
           {lookup.feedbackFormUrl && (
             <p className="hint">
               Have not submitted feedback?{" "}
