@@ -1,0 +1,33 @@
+:root {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1a2744;
+  background: #eef1f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #f4e7c5 0%, transparent 55%),
+    radial-gradient(900px 400px at 100% 0%, #d9e4f7 0%, transparent 50%),
+    #eef1f6;
+}
+
+button,
+input {
+  font: inherit;
+}
